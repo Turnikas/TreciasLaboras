@@ -4,7 +4,8 @@
 #include <iomanip>
 using namespace std;
 
-struct menuItemType {
+struct menuItemType
+{
     string menuItem;
     double menuPrice;
 };
@@ -21,7 +22,8 @@ void getData(menuItemType menuList[], int& itemCount)
 {
     ifstream fin("menu.txt");
 
-    if (!fin) {
+    if (!fin)
+    {
         cout << "Nepavyko atidaryti menu.txt failo.\n";
         itemCount = 0;
         return;
@@ -29,7 +31,8 @@ void getData(menuItemType menuList[], int& itemCount)
 
     itemCount = 0;
 
-    while (fin >> menuList[itemCount].menuItem >> menuList[itemCount].menuPrice) {
+    while (itemCount < MAX_ITEMS && fin >> menuList[itemCount].menuItem >> menuList[itemCount].menuPrice)
+    {
         itemCount++;
     }
 
@@ -42,11 +45,58 @@ void showMenu(menuItemType menuList[], int itemCount)
     cout << "=============== PUSRYCIU MENIU ===================\n";
     linija();
 
-    for (int i = 0; i < itemCount; i++) {
+    for (int i = 0; i < itemCount; i++)
+    {
         cout << i + 1 << ". " << menuList[i].menuItem << " - ";
         cout << fixed << setprecision(2) << menuList[i].menuPrice << " EUR\n";
     }
 
+    linija();
+}
+
+void printCheck(menuItemType menuList[], int indeksai[], int porcijos[], int kiek)
+{
+    ofstream fout("receipt.txt");
+
+    double suma = 0;
+
+    cout << fixed << setprecision(2);
+    fout << fixed << setprecision(2);
+
+    linija();
+    cout << "********************  SASKAITA *******************\n";
+    linija();
+
+    fout << "********************  SASKAITA *******************\n";
+
+    for (int i = 0; i < kiek; i++)
+    {
+        double eilute = menuList[indeksai[i]].menuPrice * porcijos[i];
+        suma += eilute;
+
+        cout << porcijos[i] << " x "
+             << menuList[indeksai[i]].menuItem
+             << " = " << eilute << " EUR\n";
+
+        fout << porcijos[i] << " x "
+             << menuList[indeksai[i]].menuItem
+             << " = " << eilute << " EUR\n";
+    }
+
+    double pvm = suma * 0.21;
+    double galutine = suma + pvm;
+
+    linija();
+    cout << "PVM (21%): " << pvm << " EUR\n";
+    cout << "Galutine suma: " << galutine << " EUR\n";
+
+    fout << "PVM (21%): " << pvm << " EUR\n";
+    fout << "Galutine suma: " << galutine << " EUR\n";
+
+    fout.close();
+
+    linija();
+    cout << "Jusu cekis buvo issaugotas i receipt.txt\n";
     linija();
 }
 
@@ -64,50 +114,47 @@ int main()
 
     showMenu(menuList, itemCount);
 
-    int kiekSkirtingu;
-    cout << "Kiek skirtingu patiekalu norite uzsakyti?\n> ";
-    cin >> kiekSkirtingu;
+    int kiekPatiekalu;
+    cout << "Kiek patiekalu norite uzsakyti?\n> ";
+    cin >> kiekPatiekalu;
 
-    while (kiekSkirtingu < 1 || kiekSkirtingu > MAX_ORDER_ITEMS) {
+    while (kiekPatiekalu < 1 || kiekPatiekalu > MAX_ORDER_ITEMS)
+    {
         cout << "Blogas kiekis. Iveskite nuo 1 iki " << MAX_ORDER_ITEMS << ".\n> ";
-        cin >> kiekSkirtingu;
+        cin >> kiekPatiekalu;
     }
 
-    int pasirinktiIndeksai[MAX_ORDER_ITEMS];
+    int indeksai[MAX_ORDER_ITEMS];
     int porcijos[MAX_ORDER_ITEMS];
 
-    for (int i = 0; i < kiekSkirtingu; i++) {
+    for (int i = 0; i < kiekPatiekalu; i++)
+    {
         int numeris;
         int porcija;
 
-        cout << "Iveskite " << i + 1 << "-ojo patiekalo numeri.\n> ";
+        cout << "Iveskite patiekalo numeri:\n> ";
         cin >> numeris;
 
-        while (numeris < 1 || numeris > itemCount) {
+        while (numeris < 1 || numeris > itemCount)
+        {
             cout << "Tokio patiekalo nera.\n> ";
             cin >> numeris;
         }
 
-        cout << "Iveskite porciju kieki.\n> ";
+        cout << "Iveskite porciju kieki:\n> ";
         cin >> porcija;
 
-        while (porcija < 1) {
-            cout << "Porcija turi buti bent 1.\n> ";
+        while (porcija < 1)
+        {
+            cout << "Porcija >= 1\n> ";
             cin >> porcija;
         }
 
-        pasirinktiIndeksai[i] = numeris - 1;
+        indeksai[i] = numeris - 1;
         porcijos[i] = porcija;
     }
 
-    linija();
-    cout << "Uzsakymas:\n";
-
-    for (int i = 0; i < kiekSkirtingu; i++) {
-        cout << porcijos[i] << " x " << menuList[pasirinktiIndeksai[i]].menuItem << endl;
-    }
-
-    linija();
+    printCheck(menuList, indeksai, porcijos, kiekPatiekalu);
 
     return 0;
 }
