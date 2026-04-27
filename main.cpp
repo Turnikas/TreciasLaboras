@@ -30,9 +30,10 @@ void getData(menuItemType menuList[], int& itemCount)
     }
 
     itemCount = 0;
-
+	// nuskaitai patiekala is failo, pirma pavadinima, tada kaina
     while (itemCount < MAX_ITEMS && fin >> menuList[itemCount].menuItem >> menuList[itemCount].menuPrice)
     {
+		// cia itemcount rodo i kuria masyvo specific vieta isiraso duomenys
         itemCount++;
     }
 
@@ -44,10 +45,12 @@ void showMenu(menuItemType menuList[], int itemCount)
     linija();
     cout << "=============== PUSRYCIU MENIU ===================\n";
     linija();
-
+	// eina per visus patiekalus
     for (int i = 0; i < itemCount; i++)
     {
+		// patieka numeris ir pavadinimas +1 nes nuo 1
         cout << i + 1 << ". " << menuList[i].menuItem << " - ";
+		// cia rodome 2 skaiciai po decimal
         cout << fixed << setprecision(2) << menuList[i].menuPrice << " EUR\n";
     }
 
@@ -71,6 +74,8 @@ void printCheck(menuItemType menuList[], int indeksai[], int porcijos[], int kie
 
     for (int i = 0; i < kiek; i++)
     {
+		// cia apskaiciuoja visos eilutes suma
+		// patiekalo kaina * porciju kiekis
         double eilute = menuList[indeksai[i]].menuPrice * porcijos[i];
         suma += eilute;
 
@@ -143,14 +148,15 @@ int main()
 
         cout << "Iveskite porciju kieki:\n> ";
         cin >> porcija;
-
+		// tikrina ar gera porcija ivesta
         while (porcija < 1)
         {
             cout << "Porcija >= 1\n> ";
             cin >> porcija;
         }
-
+		// useris mato nuo 1
         indeksai[i] = numeris - 1;
+		// shortcutas issaugot kiek porciju tam patiekalui
         porcijos[i] = porcija;
     }
 
